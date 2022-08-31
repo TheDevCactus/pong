@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/morgan/development/game/build",
+  "command": "/usr/bin/g++  -I/home/morgan/development/game/build -g -o CMakeFiles/Game.dir/src/main.cpp.o -c /home/morgan/development/game/src/main.cpp",
+  "file": "/home/morgan/development/game/src/main.cpp"
+}
+]

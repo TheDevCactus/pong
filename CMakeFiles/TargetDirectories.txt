@@ -1,0 +1,3 @@
+/home/morgan/development/game/CMakeFiles/Game.dir
+/home/morgan/development/game/CMakeFiles/edit_cache.dir
+/home/morgan/development/game/CMakeFiles/rebuild_cache.dir
