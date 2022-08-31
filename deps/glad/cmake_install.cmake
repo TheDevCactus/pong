@@ -1,4 +1,4 @@
-# Install script for directory: /home/morgan/development/game/deps/glad
+# Install script for directory: /home/morgan/development/pong/deps/glad
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
