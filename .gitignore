@@ -7,3 +7,4 @@ Makefile
 deps/glad/CMakeFiles/**/*
 deps/glad/Makefile
 deps/glad/cmake_install.cmake
+deps/glad/libglad.a

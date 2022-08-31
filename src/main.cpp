@@ -1,106 +1,80 @@
-//========================================================================
-// Simple multi-window example
-// Copyright (c) Camilla Löwy <elmindreda@glfw.org>
-//
-// This software is provided 'as-is', without any express or implied
-// warranty. In no event will the authors be held liable for any damages
-// arising from the use of this software.
-//
-// Permission is granted to anyone to use this software for any purpose,
-// including commercial applications, and to alter it and redistribute it
-// freely, subject to the following restrictions:
-//
-// 1. The origin of this software must not be misrepresented; you must not
-//    claim that you wrote the original software. If you use this software
-//    in a product, an acknowledgment in the product documentation would
-//    be appreciated but is not required.
-//
-// 2. Altered source versions must be plainly marked as such, and must not
-//    be misrepresented as being the original software.
-//
-// 3. This notice may not be removed or altered from any source
-//    distribution.
-//
-//========================================================================
-
-#define GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
-#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
 
-int main(int argc, char** argv)
-{
-    int xpos, ypos, height;
-    const char* description;
-    GLFWwindow* windows[4];
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+void processInput(GLFWwindow *window);
 
-    if (!glfwInit())
-    {
-        glfwGetError(&description);
-        printf("Error: %s\n", description);
-        exit(EXIT_FAILURE);
-    }
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
 
-    glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+int main() {
+  // glfw: initialize and configure
+  // ------------------------------
+  glfwInit();
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    glfwGetMonitorWorkarea(glfwGetPrimaryMonitor(), &xpos, &ypos, NULL, &height);
+  // glfw window creation
+  // --------------------
+  GLFWwindow *window =
+      glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Pong - My first cpp game", NULL, NULL);
+  if (window == NULL) {
+    std::cerr << "Failed to create GLFW window" << std::endl;
+    glfwTerminate();
+    return -1;
+  }
+  glfwMakeContextCurrent(window);
+  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    for (int i = 0;  i < 4;  i++)
-    {
-        const int size = height / 5;
-        const struct
-        {
-            float r, g, b;
-        } colors[] =
-        {
-            { 0.95f, 0.32f, 0.11f },
-            { 0.50f, 0.80f, 0.16f },
-            {   0.f, 0.68f, 0.94f },
-            { 0.98f, 0.74f, 0.04f }
-        };
+  // glad: load all OpenGL function pointers
+  // ---------------------------------------
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    std::cerr << "Failed to initialize GLAD" << std::endl;
+    return -1;
+  }
 
-        if (i > 0)
-            glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_FALSE);
+  // render loop
+  // -----------
+  while (!glfwWindowShouldClose(window)) {
+    // input
+    // -----
+    processInput(window);
 
-        glfwWindowHint(GLFW_POSITION_X, xpos + size * (1 + (i & 1)));
-        glfwWindowHint(GLFW_POSITION_Y, ypos + size * (1 + (i >> 1)));
+    // render
+    // ------
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-        windows[i] = glfwCreateWindow(size, size, "Multi-Window Example", NULL, NULL);
-        if (!windows[i])
-        {
-            glfwGetError(&description);
-            printf("Error: %s\n", description);
-            glfwTerminate();
-            exit(EXIT_FAILURE);
-        }
+    // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved
+    // etc.)
+    // -------------------------------------------------------------------------------
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+  }
 
-        glfwSetInputMode(windows[i], GLFW_STICKY_KEYS, GLFW_TRUE);
-
-        glfwMakeContextCurrent(windows[i]);
-        gladLoadGL();
-        glClearColor(colors[i].r, colors[i].g, colors[i].b, 1.f);
-    }
-
-    for (;;)
-    {
-        for (int i = 0;  i < 4;  i++)
-        {
-            glfwMakeContextCurrent(windows[i]);
-            glClear(GL_COLOR_BUFFER_BIT);
-            glfwSwapBuffers(windows[i]);
-
-            if (glfwWindowShouldClose(windows[i]) ||
-                glfwGetKey(windows[i], GLFW_KEY_ESCAPE))
-            {
-                glfwTerminate();
-                exit(EXIT_SUCCESS);
-            }
-        }
-
-        glfwWaitEvents();
-    }
+  // glfw: terminate, clearing all previously allocated GLFW resources.
+  // ------------------------------------------------------------------
+  glfwTerminate();
+  return 0;
 }
 
+// process all input: query GLFW whether relevant keys are pressed/released this
+// frame and react accordingly
+// ---------------------------------------------------------------------------------------------------------
+void processInput(GLFWwindow *window) {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, true);
+}
+
+// glfw: whenever the window size changed (by OS or user resize) this callback
+// function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+  // make sure the viewport matches the new window dimensions; note that width
+  // and height will be significantly larger than specified on retina displays.
+  glViewport(0, 0, width, height);
+}
