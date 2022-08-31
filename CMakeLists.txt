@@ -13,10 +13,10 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(deps/glfw)
 add_subdirectory(deps/glad)
 
-configure_file(src/GameConfig.h.in src/GameConfig.h)
-
 target_link_libraries(Game glfw)
 target_link_libraries(Game glad)
+
+configure_file(src/GameConfig.h.in src/GameConfig.h)
 
 target_include_directories(Game PUBLIC "${PROJECT_BINARY_DIR}")
 
