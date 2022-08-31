@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/Game.dir/src/main.cpp.o -o Game  deps/glfw/src/libglfw3.a deps/glad/libglad.a /usr/lib/x86_64-linux-gnu/librt.a -lm -ldl 
