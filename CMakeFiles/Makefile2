@@ -64,21 +64,74 @@ CMAKE_BINARY_DIR = /home/morgan/development/game
 
 # The main recursive "all" target.
 all: CMakeFiles/Game.dir/all
+all: deps/glfw/all
+all: deps/glad/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
-preinstall:
+preinstall: deps/glfw/preinstall
+preinstall: deps/glad/preinstall
 .PHONY : preinstall
 
 # The main recursive "clean" target.
 clean: CMakeFiles/Game.dir/clean
+clean: deps/glfw/clean
+clean: deps/glad/clean
 .PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory deps/glad
+
+# Recursive "all" directory target.
+deps/glad/all: deps/glad/CMakeFiles/glad.dir/all
+.PHONY : deps/glad/all
+
+# Recursive "preinstall" directory target.
+deps/glad/preinstall:
+.PHONY : deps/glad/preinstall
+
+# Recursive "clean" directory target.
+deps/glad/clean: deps/glad/CMakeFiles/glad.dir/clean
+.PHONY : deps/glad/clean
+
+#=============================================================================
+# Directory level rules for directory deps/glfw
+
+# Recursive "all" directory target.
+deps/glfw/all: deps/glfw/src/all
+.PHONY : deps/glfw/all
+
+# Recursive "preinstall" directory target.
+deps/glfw/preinstall: deps/glfw/src/preinstall
+.PHONY : deps/glfw/preinstall
+
+# Recursive "clean" directory target.
+deps/glfw/clean: deps/glfw/CMakeFiles/uninstall.dir/clean
+deps/glfw/clean: deps/glfw/src/clean
+.PHONY : deps/glfw/clean
+
+#=============================================================================
+# Directory level rules for directory deps/glfw/src
+
+# Recursive "all" directory target.
+deps/glfw/src/all: deps/glfw/src/CMakeFiles/glfw.dir/all
+.PHONY : deps/glfw/src/all
+
+# Recursive "preinstall" directory target.
+deps/glfw/src/preinstall:
+.PHONY : deps/glfw/src/preinstall
+
+# Recursive "clean" directory target.
+deps/glfw/src/clean: deps/glfw/src/CMakeFiles/glfw.dir/clean
+deps/glfw/src/clean: deps/glfw/src/CMakeFiles/update_mappings.dir/clean
+.PHONY : deps/glfw/src/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/Game.dir
 
 # All Build rule for target.
-CMakeFiles/Game.dir/all:
+CMakeFiles/Game.dir/all: deps/glfw/src/CMakeFiles/glfw.dir/all
+CMakeFiles/Game.dir/all: deps/glad/CMakeFiles/glad.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Game.dir/build.make CMakeFiles/Game.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Game.dir/build.make CMakeFiles/Game.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/morgan/development/game/CMakeFiles --progress-num=1,2 "Built target Game"
@@ -86,7 +139,7 @@ CMakeFiles/Game.dir/all:
 
 # Build rule for subdir invocation for target.
 CMakeFiles/Game.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/morgan/development/game/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/morgan/development/game/CMakeFiles 28
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/Game.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/morgan/development/game/CMakeFiles 0
 .PHONY : CMakeFiles/Game.dir/rule
@@ -99,6 +152,110 @@ Game: CMakeFiles/Game.dir/rule
 CMakeFiles/Game.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Game.dir/build.make CMakeFiles/Game.dir/clean
 .PHONY : CMakeFiles/Game.dir/clean
+
+#=============================================================================
+# Target rules for target deps/glfw/CMakeFiles/uninstall.dir
+
+# All Build rule for target.
+deps/glfw/CMakeFiles/uninstall.dir/all:
+	$(MAKE) $(MAKESILENT) -f deps/glfw/CMakeFiles/uninstall.dir/build.make deps/glfw/CMakeFiles/uninstall.dir/depend
+	$(MAKE) $(MAKESILENT) -f deps/glfw/CMakeFiles/uninstall.dir/build.make deps/glfw/CMakeFiles/uninstall.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/morgan/development/game/CMakeFiles --progress-num= "Built target uninstall"
+.PHONY : deps/glfw/CMakeFiles/uninstall.dir/all
+
+# Build rule for subdir invocation for target.
+deps/glfw/CMakeFiles/uninstall.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/morgan/development/game/CMakeFiles 0
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 deps/glfw/CMakeFiles/uninstall.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/morgan/development/game/CMakeFiles 0
+.PHONY : deps/glfw/CMakeFiles/uninstall.dir/rule
+
+# Convenience name for target.
+uninstall: deps/glfw/CMakeFiles/uninstall.dir/rule
+.PHONY : uninstall
+
+# clean rule for target.
+deps/glfw/CMakeFiles/uninstall.dir/clean:
+	$(MAKE) $(MAKESILENT) -f deps/glfw/CMakeFiles/uninstall.dir/build.make deps/glfw/CMakeFiles/uninstall.dir/clean
+.PHONY : deps/glfw/CMakeFiles/uninstall.dir/clean
+
+#=============================================================================
+# Target rules for target deps/glfw/src/CMakeFiles/glfw.dir
+
+# All Build rule for target.
+deps/glfw/src/CMakeFiles/glfw.dir/all:
+	$(MAKE) $(MAKESILENT) -f deps/glfw/src/CMakeFiles/glfw.dir/build.make deps/glfw/src/CMakeFiles/glfw.dir/depend
+	$(MAKE) $(MAKESILENT) -f deps/glfw/src/CMakeFiles/glfw.dir/build.make deps/glfw/src/CMakeFiles/glfw.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/morgan/development/game/CMakeFiles --progress-num=5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28 "Built target glfw"
+.PHONY : deps/glfw/src/CMakeFiles/glfw.dir/all
+
+# Build rule for subdir invocation for target.
+deps/glfw/src/CMakeFiles/glfw.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/morgan/development/game/CMakeFiles 24
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 deps/glfw/src/CMakeFiles/glfw.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/morgan/development/game/CMakeFiles 0
+.PHONY : deps/glfw/src/CMakeFiles/glfw.dir/rule
+
+# Convenience name for target.
+glfw: deps/glfw/src/CMakeFiles/glfw.dir/rule
+.PHONY : glfw
+
+# clean rule for target.
+deps/glfw/src/CMakeFiles/glfw.dir/clean:
+	$(MAKE) $(MAKESILENT) -f deps/glfw/src/CMakeFiles/glfw.dir/build.make deps/glfw/src/CMakeFiles/glfw.dir/clean
+.PHONY : deps/glfw/src/CMakeFiles/glfw.dir/clean
+
+#=============================================================================
+# Target rules for target deps/glfw/src/CMakeFiles/update_mappings.dir
+
+# All Build rule for target.
+deps/glfw/src/CMakeFiles/update_mappings.dir/all:
+	$(MAKE) $(MAKESILENT) -f deps/glfw/src/CMakeFiles/update_mappings.dir/build.make deps/glfw/src/CMakeFiles/update_mappings.dir/depend
+	$(MAKE) $(MAKESILENT) -f deps/glfw/src/CMakeFiles/update_mappings.dir/build.make deps/glfw/src/CMakeFiles/update_mappings.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/morgan/development/game/CMakeFiles --progress-num=29 "Built target update_mappings"
+.PHONY : deps/glfw/src/CMakeFiles/update_mappings.dir/all
+
+# Build rule for subdir invocation for target.
+deps/glfw/src/CMakeFiles/update_mappings.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/morgan/development/game/CMakeFiles 1
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 deps/glfw/src/CMakeFiles/update_mappings.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/morgan/development/game/CMakeFiles 0
+.PHONY : deps/glfw/src/CMakeFiles/update_mappings.dir/rule
+
+# Convenience name for target.
+update_mappings: deps/glfw/src/CMakeFiles/update_mappings.dir/rule
+.PHONY : update_mappings
+
+# clean rule for target.
+deps/glfw/src/CMakeFiles/update_mappings.dir/clean:
+	$(MAKE) $(MAKESILENT) -f deps/glfw/src/CMakeFiles/update_mappings.dir/build.make deps/glfw/src/CMakeFiles/update_mappings.dir/clean
+.PHONY : deps/glfw/src/CMakeFiles/update_mappings.dir/clean
+
+#=============================================================================
+# Target rules for target deps/glad/CMakeFiles/glad.dir
+
+# All Build rule for target.
+deps/glad/CMakeFiles/glad.dir/all:
+	$(MAKE) $(MAKESILENT) -f deps/glad/CMakeFiles/glad.dir/build.make deps/glad/CMakeFiles/glad.dir/depend
+	$(MAKE) $(MAKESILENT) -f deps/glad/CMakeFiles/glad.dir/build.make deps/glad/CMakeFiles/glad.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/morgan/development/game/CMakeFiles --progress-num=3,4 "Built target glad"
+.PHONY : deps/glad/CMakeFiles/glad.dir/all
+
+# Build rule for subdir invocation for target.
+deps/glad/CMakeFiles/glad.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/morgan/development/game/CMakeFiles 2
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 deps/glad/CMakeFiles/glad.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/morgan/development/game/CMakeFiles 0
+.PHONY : deps/glad/CMakeFiles/glad.dir/rule
+
+# Convenience name for target.
+glad: deps/glad/CMakeFiles/glad.dir/rule
+.PHONY : glad
+
+# clean rule for target.
+deps/glad/CMakeFiles/glad.dir/clean:
+	$(MAKE) $(MAKESILENT) -f deps/glad/CMakeFiles/glad.dir/build.make deps/glad/CMakeFiles/glad.dir/clean
+.PHONY : deps/glad/CMakeFiles/glad.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

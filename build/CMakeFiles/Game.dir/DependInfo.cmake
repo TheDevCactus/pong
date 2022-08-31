@@ -13,6 +13,8 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
+  "/home/morgan/development/game/build/deps/glfw/src/CMakeFiles/glfw.dir/DependInfo.cmake"
+  "/home/morgan/development/game/build/deps/glad/CMakeFiles/glad.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

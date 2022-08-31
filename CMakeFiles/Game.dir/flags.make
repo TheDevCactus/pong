@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/morgan/development/game
+CXX_INCLUDES = -I/home/morgan/development/game -I/home/morgan/development/game/deps/glfw/include -I/home/morgan/development/game/deps/glad/include
 
 CXX_FLAGS = 
 

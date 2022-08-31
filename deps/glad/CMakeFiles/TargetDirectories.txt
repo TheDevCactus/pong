@@ -1,0 +1,3 @@
+/home/morgan/development/game/deps/glad/CMakeFiles/glad.dir
+/home/morgan/development/game/deps/glad/CMakeFiles/edit_cache.dir
+/home/morgan/development/game/deps/glad/CMakeFiles/rebuild_cache.dir
