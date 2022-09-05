@@ -134,12 +134,21 @@ bool initializeShaderFromFile(std::string filePath, GLenum shaderType, unsigned 
     return true;
 }
 
+/**
+ * @brief Create a Shader Program object, and delete shaders provided.
+ * 
+ * @param shaders 
+ * @param shaderProgram 
+ * @return true 
+ * @return false 
+ */
 bool createShaderProgram(unsigned int shaders[], unsigned int &shaderProgram) {
     shaderProgram = glCreateProgram();
 
     int shaderCount = sizeof(shaders) / sizeof(unsigned int);
     for (int i = 0; i < shaderCount; i++) {
-        glAttachShader(shaderProgram, shaders[i]);       
+        glAttachShader(shaderProgram, shaders[i]);
+        glDeleteShader(shaders[i]);     
     }
     glLinkProgram(shaderProgram);
 
@@ -152,30 +161,20 @@ bool createShaderProgram(unsigned int shaders[], unsigned int &shaderProgram) {
         return false;
     }
 
-    // Might be able to do this in the above for loop as well.
-    for (int i = 0; i < shaderCount; i++) {
-        glDeleteShader(shaders[i]);       
-    }
     return true;
 }
 
 int main() {
-    // Initialize GLFW and GLAD.
-    // This creates our OpenGL context, and our application window
     GLFWwindow *window_p = initializeGLFWandGLAD();
     if (window_p == NULL) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
     }
 
-    // Initialize our vertex shader.
-    unsigned int vertexShader;
-    if (!initializeShaderFromFile("src/shaders/vertexShader.GLSL", GL_VERTEX_SHADER, vertexShader)) {
-        return -1;
-    }
-
-    // Initialize our fragment shader.
-    unsigned int fragmentShader;
-    if (!initializeShaderFromFile("src/shaders/fragmentShader.GLSL", GL_FRAGMENT_SHADER, fragmentShader)) {
+    unsigned int vertexShader, fragmentShader;
+    if (
+        !initializeShaderFromFile("src/shaders/vertexShader.GLSL", GL_VERTEX_SHADER, vertexShader) ||
+        !initializeShaderFromFile("src/shaders/fragmentShader.GLSL", GL_FRAGMENT_SHADER, fragmentShader)
+    ) {
         return -1;
     }
 
@@ -209,10 +208,10 @@ int main() {
     // Let OpenGL know we wish to work with our VBO Buffer
     // glBindBuffer lets openGL know which buffer you wish to work with
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // Copy verticies into the currently bound buffer
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verticies), verticies, GL_STATIC_DRAW);
     // Specify how OpenGL should interpret our vertex data
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    // Copy verticies into the currently bound buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verticies), verticies, GL_STATIC_DRAW);
     // Tell OpenGL to use that specification
     glEnableVertexAttribArray(0);
 
@@ -237,8 +236,13 @@ int main() {
 
         // Poll events
         glfwPollEvents();
-        verticies[7] += 0.01;
-        std::cout << verticies[7] << std::endl;
+        verticies[1] += 0.005f;
+        verticies[4] += 0.005f;
+        verticies[7] += 0.005f;
+
+        verticies[0] += 0.005f;
+        verticies[3] += 0.005f;
+        verticies[6] += 0.005f;
     }
 
     glDeleteVertexArrays(1, &VAO);
