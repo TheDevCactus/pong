@@ -2,17 +2,38 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <string>
+#include <fstream>
 
+/**
+ * @brief Update OpenGL Viewport size through GLFW callback
+ * 
+ * @param window_p 
+ * @param width 
+ * @param height 
+ */
 void framebuffer_size_callback(GLFWwindow *window_p, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
+/**
+ * @brief Process user input 
+ * 
+ * @param window_p 
+ */
 void processInput(GLFWwindow *window_p) {
     if (glfwGetKey(window_p, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window_p, true);
     }
 }
 
+/**
+ * @brief Initialize GLFW and GLAD
+ * This creates our GLFW window, initializes OpenGL, and binds our
+ * frame buffer resize callback.
+ * 
+ * @return GLFWwindow* 
+ */
 GLFWwindow* initializeGLFWandGLAD() {
     // Initialize GLFW
     glfwInit();
@@ -45,10 +66,124 @@ GLFWwindow* initializeGLFWandGLAD() {
     return window_p;
 }
 
+/**
+ * @brief Reads a file into a std::string. Returns true if
+ * file was succesfully read, otherwise returns false
+ * 
+ * @param filePath 
+ * @param fileContents 
+ * @return true 
+ * @return false 
+ */
+bool readFileToString(std::string filePath, std::string &fileContents) {
+    // Open the file
+    std::ifstream inFileStream;
+    std::string line;
+    inFileStream.open(filePath);
+
+    // If the file is not open, throw error, return
+    if (!inFileStream.is_open()) {
+        std::cerr << "Error while attempting to open file: " << filePath << std::endl;
+        return false;
+    }
+
+    // While there is more of the file to read,
+    // read a line and append it to our output
+    while(getline(inFileStream, line)) {
+        fileContents.append(line + '\n');
+    }
+
+    // Close the file, and signify we successfully read the file
+    inFileStream.close();
+    return true;
+}
+
+/**
+ * @brief Reads a shader source file, and creates a shader
+ * from that source code. Returns true on success, otherwise
+ * returns false.
+ * 
+ * @param filePath 
+ * @param shaderType 
+ * @param shader 
+ * @return true 
+ * @return false 
+ */
+bool initializeShaderFromFile(std::string filePath, GLenum shaderType, unsigned int &shader) {
+    // Read shader source file
+    std::string fileSource;
+    if (!readFileToString(filePath, fileSource)) {
+        return false;
+    }
+
+    // Create and compile the shader
+    shader = glCreateShader(shaderType);
+    const char *shaderSource = fileSource.c_str();
+    glShaderSource(shader, 1, &shaderSource, NULL);
+    glCompileShader(shader);
+
+    // Check if compilation was succesfull
+    int success;
+    char infoLog[512];
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(shader, 512, NULL, infoLog);
+        std::cerr << "Failed to compile shader\n" << infoLog << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool createShaderProgram(unsigned int shaders[], unsigned int &shaderProgram) {
+    shaderProgram = glCreateProgram();
+
+    int shaderCount = sizeof(shaders) / sizeof(unsigned int);
+    for (int i = 0; i < shaderCount; i++) {
+        glAttachShader(shaderProgram, shaders[i]);       
+    }
+    glLinkProgram(shaderProgram);
+
+    int success;
+    char infoLog[512];
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cerr << "Failed to create shader program\n" << infoLog << std::endl;
+        return false;
+    }
+
+    // Might be able to do this in the above for loop as well.
+    for (int i = 0; i < shaderCount; i++) {
+        glDeleteShader(shaders[i]);       
+    }
+    return true;
+}
+
 int main() {
+    // Initialize GLFW and GLAD.
+    // This creates our OpenGL context, and our application window
     GLFWwindow *window_p = initializeGLFWandGLAD();
     if (window_p == NULL) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
+    }
+
+    // Initialize our vertex shader.
+    unsigned int vertexShader;
+    if (!initializeShaderFromFile("src/shaders/vertexShader.GLSL", GL_VERTEX_SHADER, vertexShader)) {
+        return -1;
+    }
+
+    // Initialize our fragment shader.
+    unsigned int fragmentShader;
+    if (!initializeShaderFromFile("src/shaders/fragmentShader.GLSL", GL_FRAGMENT_SHADER, fragmentShader)) {
+        return -1;
+    }
+
+    // Create and use our shader program
+    unsigned int shaderProgram;
+    unsigned int shaders[2] = {vertexShader, fragmentShader};
+    if (!createShaderProgram(shaders, shaderProgram)) {
+        return -1;
     }
 
     float verticies[] = {
@@ -57,16 +192,29 @@ int main() {
          0.0f,  0.5f, 0.0f
     };
 
+
     // Create VBO Buffer
     // This is the section of memory we use
     // to pass data to the GPU.
     unsigned int VBO;
     glGenBuffers(1, &VBO);
+
+    // Create our VAO
+    // This is how we store vertex attributes
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+
+    // Let OpenGL know we wish to work with the specified VAO
+    glBindVertexArray(VAO);
     // Let OpenGL know we wish to work with our VBO Buffer
     // glBindBuffer lets openGL know which buffer you wish to work with
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     // Copy verticies into the currently bound buffer
     glBufferData(GL_ARRAY_BUFFER, sizeof(verticies), verticies, GL_STATIC_DRAW);
+    // Specify how OpenGL should interpret our vertex data
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    // Tell OpenGL to use that specification
+    glEnableVertexAttribArray(0);
 
     // Application Loop
     while(!glfwWindowShouldClose(window_p)) {
@@ -74,15 +222,28 @@ int main() {
         processInput(window_p);
         
         // Clear screen
-        glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+
+        glBufferData(GL_ARRAY_BUFFER, sizeof(verticies), verticies, GL_STATIC_DRAW);
+        // Use our shader program we created earlier
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
         // Swap color buffers
         glfwSwapBuffers(window_p);
 
         // Poll events
         glfwPollEvents();
+        verticies[7] += 0.01;
+        std::cout << verticies[7] << std::endl;
     }
+
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteProgram(shaderProgram);
 
     glfwTerminate();
     return 0;
