@@ -1,9 +1,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <vector>
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <math.h>
 
 /**
  * @brief Update OpenGL Viewport size through GLFW callback
@@ -164,6 +166,51 @@ bool createShaderProgram(unsigned int shaders[], unsigned int &shaderProgram) {
     return true;
 }
 
+struct Position {
+    float x;
+    float y;
+    float z;
+};
+
+struct Renderable {
+    std::vector<float> vertices;
+    unsigned int VBO;
+    unsigned int VAO;
+};
+
+Renderable createRenderable(float vertices[], unsigned int numberOfVerticies) {
+    unsigned int floatsPerVertexPoint = 3;
+    Renderable newRenderable;
+
+    for (int i = 0; i < numberOfVerticies; i ++) {
+        newRenderable.vertices.push_back(vertices[i]);
+    }
+
+    glGenBuffers(1, &newRenderable.VBO);
+    glGenVertexArrays(1, &newRenderable.VAO);
+
+    glBindVertexArray(newRenderable.VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, newRenderable.VBO);
+
+    glVertexAttribPointer(
+        0, 
+        floatsPerVertexPoint, 
+        GL_FLOAT, 
+        GL_FALSE, 
+        floatsPerVertexPoint * sizeof(float), 
+        (void*)0
+    );
+    glEnableVertexAttribArray(0);
+    return newRenderable;
+}
+
+void renderRenderable(Renderable renderable) {
+    float *verticesToRender = renderable.vertices.data();
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verticesToRender), verticesToRender, GL_STATIC_DRAW);
+    // Use our shader program we created earlier
+    glDrawArrays(GL_TRIANGLES, 0, (sizeof(verticesToRender) / sizeof(float))); 
+}
+
 int main() {
     GLFWwindow *window_p = initializeGLFWandGLAD();
     if (window_p == NULL) {
@@ -185,12 +232,14 @@ int main() {
         return -1;
     }
 
-    float verticies[] = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.0f,  0.5f, 0.0f
-    };
-
+    float vertices[] = {
+     0.5f, -0.5f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f, // bottom left
+    -0.5f,  0.0f, 0.0f, // top left
+     0.5f, -0.5f, 0.0f, // bottom right
+    -0.5f,  0.0f, 0.0f, // top left
+     0.5f,  0.0f, 0.0f, // top right
+    }; 
 
     // Create VBO Buffer
     // This is the section of memory we use
@@ -208,12 +257,13 @@ int main() {
     // Let OpenGL know we wish to work with our VBO Buffer
     // glBindBuffer lets openGL know which buffer you wish to work with
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // Specify how OpenGL should interpret our vertex data
+    // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    // Copy verticies into the currently bound buffer
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verticies), verticies, GL_STATIC_DRAW);
-    // Tell OpenGL to use that specification
     glEnableVertexAttribArray(0);
+    // color attribute
+    // Copy verticies into the currently bound buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    // Tell OpenGL to use that specification
 
     // Application Loop
     while(!glfwWindowShouldClose(window_p)) {
@@ -224,25 +274,18 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-
-        glBufferData(GL_ARRAY_BUFFER, sizeof(verticies), verticies, GL_STATIC_DRAW);
-        // Use our shader program we created earlier
-        glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glUseProgram(shaderProgram);
+
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        // Use our shader program we created earlier
+        glDrawArrays(GL_TRIANGLES, 0, (sizeof(vertices) / sizeof(float)));
 
         // Swap color buffers
         glfwSwapBuffers(window_p);
 
         // Poll events
         glfwPollEvents();
-        verticies[1] += 0.005f;
-        verticies[4] += 0.005f;
-        verticies[7] += 0.005f;
-
-        verticies[0] += 0.005f;
-        verticies[3] += 0.005f;
-        verticies[6] += 0.005f;
     }
 
     glDeleteVertexArrays(1, &VAO);
