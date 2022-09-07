@@ -12,9 +12,11 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(deps/glfw)
 add_subdirectory(deps/glad)
+add_subdirectory(deps/glm)
 
 target_link_libraries(Game glfw)
 target_link_libraries(Game glad)
+target_link_libraries(Game glm)
 
 configure_file(src/GameConfig.h.in src/GameConfig.h)
 

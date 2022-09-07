@@ -1,5 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 #include <vector>
 #include <iostream>
@@ -179,7 +180,7 @@ struct Renderable {
 };
 
 Renderable createRenderable(float vertices[], unsigned int numberOfVerticies) {
-    unsigned int floatsPerVertexPoint = 3;
+    float floatsPerVertexPoint = 3;
     Renderable newRenderable;
 
     for (int i = 0; i < numberOfVerticies; i ++) {
@@ -205,10 +206,20 @@ Renderable createRenderable(float vertices[], unsigned int numberOfVerticies) {
 }
 
 void renderRenderable(Renderable renderable) {
-    float *verticesToRender = renderable.vertices.data();
+    float verticesToRender[renderable.vertices.size()];
+    std::copy(renderable.vertices.begin(), renderable.vertices.end(), verticesToRender);
+
+    glBindVertexArray(renderable.VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, renderable.VBO);
+
     glBufferData(GL_ARRAY_BUFFER, sizeof(verticesToRender), verticesToRender, GL_STATIC_DRAW);
-    // Use our shader program we created earlier
-    glDrawArrays(GL_TRIANGLES, 0, (sizeof(verticesToRender) / sizeof(float))); 
+
+    glDrawArrays(GL_TRIANGLES, 0, (sizeof(verticesToRender) / sizeof(float)) / 3); 
+}
+
+void deleteRenderable(Renderable renderable) {
+    glDeleteBuffers(1, &renderable.VBO);
+    glDeleteVertexArrays(1, &renderable.VAO);
 }
 
 int main() {
@@ -224,7 +235,7 @@ int main() {
     ) {
         return -1;
     }
-
+    
     // Create and use our shader program
     unsigned int shaderProgram;
     unsigned int shaders[2] = {vertexShader, fragmentShader};
@@ -232,7 +243,7 @@ int main() {
         return -1;
     }
 
-    float vertices[] = {
+    float paddleVerticies[] = {
      0.5f, -0.5f, 0.0f, // bottom right
     -0.5f, -0.5f, 0.0f, // bottom left
     -0.5f,  0.0f, 0.0f, // top left
@@ -240,31 +251,16 @@ int main() {
     -0.5f,  0.0f, 0.0f, // top left
      0.5f,  0.0f, 0.0f, // top right
     }; 
-
-    // Create VBO Buffer
-    // This is the section of memory we use
-    // to pass data to the GPU.
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-
-    // Create our VAO
-    // This is how we store vertex attributes
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-
-    // Let OpenGL know we wish to work with the specified VAO
-    glBindVertexArray(VAO);
-    // Let OpenGL know we wish to work with our VBO Buffer
-    // glBindBuffer lets openGL know which buffer you wish to work with
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // color attribute
-    // Copy verticies into the currently bound buffer
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    // Tell OpenGL to use that specification
-
+    Renderable paddle = createRenderable(paddleVerticies, 6 * 3);
+    float paddleVerticiesB[] = {
+     0.0f,  0.0f, 0.0f, // bottom right
+    -0.5f,  0.0f, 0.0f, // bottom left
+    -0.5f,  0.5f, 0.0f, // top left
+     0.5f,  0.0f, 0.0f, // bottom right
+    -0.5f,  0.5f, 0.0f, // top left
+     0.5f,  0.5f, 0.0f, // top right
+    }; 
+    Renderable paddleB = createRenderable(paddleVerticiesB, 6 * 3);
     // Application Loop
     while(!glfwWindowShouldClose(window_p)) {
         // Process user input
@@ -274,22 +270,20 @@ int main() {
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBindVertexArray(VAO);
         glUseProgram(shaderProgram);
 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        // Use our shader program we created earlier
-        glDrawArrays(GL_TRIANGLES, 0, (sizeof(vertices) / sizeof(float)));
+        renderRenderable(paddle);
+        renderRenderable(paddleB);
 
-        // Swap color buffers
+        // // Swap color buffers
         glfwSwapBuffers(window_p);
 
         // Poll events
         glfwPollEvents();
     }
 
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    deleteRenderable(paddle);
+    // deleteRenderable(paddleB);
     glDeleteProgram(shaderProgram);
 
     glfwTerminate();
