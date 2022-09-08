@@ -328,11 +328,21 @@ int main() {
     ball.position[0] = 400.0f;
 
     float paddleSpeed = 10.0f;
-    float ballSpeed = 1.0f;
+    float ballSpeed = 3.0f;
     bool gameStarted = false;
     glm::vec2 ballForce = glm::vec2(0.0f, 0.0f);
+
+    float time = glfwGetTime();
+    int frames = 0;
     // Application Loop
     while(!glfwWindowShouldClose(window_p)) {
+        ++frames;
+        float currentTime = glfwGetTime();
+        if (currentTime - 1 > time) {
+            std::cout << "FPS: " << frames << std::endl;
+            frames = 0;
+            time = currentTime;
+        }
         // Process user input
         {
             // Start Game - SPACE BAR
@@ -431,7 +441,7 @@ int main() {
         }
 
         // Clear screen
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.1f, 0.9f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         renderGameObject(paddleA, modelUniformLocation);
