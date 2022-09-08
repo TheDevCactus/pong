@@ -39,35 +39,16 @@ struct Camera {
     glm::mat4 projection;
 };
 
-/**
- * @brief Update OpenGL Viewport size through GLFW callback
- * 
- * @param window_p 
- * @param width 
- * @param height 
- */
 void framebuffer_size_callback(GLFWwindow *window_p, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-/**
- * @brief Process user input 
- * 
- * @param window_p 
- */
 void processInput(GLFWwindow *window_p) {
     if (glfwGetKey(window_p, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window_p, true);
     }
 }
 
-/**
- * @brief Initialize GLFW and GLAD
- * This creates our GLFW window, initializes OpenGL, and binds our
- * frame buffer resize callback.
- * 
- * @return GLFWwindow* 
- */
 GLFWwindow* initializeGLFWandGLAD() {
     // Initialize GLFW
     glfwInit();
@@ -100,15 +81,6 @@ GLFWwindow* initializeGLFWandGLAD() {
     return window_p;
 }
 
-/**
- * @brief Reads a file into a std::string. Returns true if
- * file was succesfully read, otherwise returns false
- * 
- * @param filePath 
- * @param fileContents 
- * @return true 
- * @return false 
- */
 bool readFileToString(std::string filePath, std::string &fileContents) {
     // Open the file
     std::ifstream inFileStream;
@@ -132,17 +104,6 @@ bool readFileToString(std::string filePath, std::string &fileContents) {
     return true;
 }
 
-/**
- * @brief Reads a shader source file, and creates a shader
- * from that source code. Returns true on success, otherwise
- * returns false.
- * 
- * @param filePath 
- * @param shaderType 
- * @param shader 
- * @return true 
- * @return false 
- */
 bool initializeShaderFromFile(std::string filePath, GLenum shaderType, unsigned int &shader) {
     // Read shader source file
     std::string fileSource;
@@ -194,14 +155,6 @@ bool readAssetFile(std::string assetFilePath, std::vector<float> &verticies) {
     return true;
 }
 
-/**
- * @brief Create a Shader Program object, and delete shaders provided.
- * 
- * @param shaders 
- * @param shaderProgram 
- * @return true 
- * @return false 
- */
 bool createShaderProgram(unsigned int shaders[], unsigned int shaderCount, unsigned int &shaderProgram) {
     shaderProgram = glCreateProgram();
 
