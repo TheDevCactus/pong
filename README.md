@@ -30,7 +30,7 @@ Shaders can be found in the `./shaders` directory.
 
 #### Glad
 
-    Multi-Language Vulkan/GL/GLES/EGL/GLX/WGL Loader-Generator based on the official specs.
+"Multi-Language Vulkan/GL/GLES/EGL/GLX/WGL Loader-Generator based on the official specs."
 
 Glad lets us configure OpenGL easily across multiple platforms.
 
@@ -38,13 +38,13 @@ Glad lets us configure OpenGL easily across multiple platforms.
 
 #### GLFW
 
-    GLFW is an Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan development on the desktop. It provides a simple API for creating windows, contexts and surfaces, receiving input and events.
+"GLFW is an Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan development on the desktop. It provides a simple API for creating windows, contexts and surfaces, receiving input and events."
 
 [Website](https://www.glfw.org/)
 
 #### GLM
 
-    OpenGL Mathematics (GLM) is a header only C++ mathematics library for graphics software based on the OpenGL Shading Language (GLSL) specifications.
+"OpenGL Mathematics (GLM) is a header only C++ mathematics library for graphics software based on the OpenGL Shading Language (GLSL) specifications."
 
 [Website](https://github.com/g-truc/glm)
 
