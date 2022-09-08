@@ -31,6 +31,7 @@ struct GameObject {
     Renderable renderable;
     glm::vec3 position;
     glm::vec3 rotation;
+    glm::vec2 size;
 };
 
 struct Camera {
@@ -41,12 +42,6 @@ struct Camera {
 
 void framebuffer_size_callback(GLFWwindow *window_p, int width, int height) {
     glViewport(0, 0, width, height);
-}
-
-void processInput(GLFWwindow *window_p) {
-    if (glfwGetKey(window_p, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window_p, true);
-    }
 }
 
 GLFWwindow* initializeGLFWandGLAD() {
@@ -311,7 +306,6 @@ int main() {
     // Application Loop
     while(!glfwWindowShouldClose(window_p)) {
         // Process user input
-        // processInput(window_p);
         if (glfwGetKey(window_p, GLFW_KEY_A) == GLFW_PRESS) {
             if (paddleB.position[0] < paddleSpeed) {
                 paddleB.position[0] = 0.0f;
