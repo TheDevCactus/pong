@@ -57,3 +57,7 @@ Glad lets us configure OpenGL easily across multiple platforms.
 5) `cmake --build .`
 
 You might be missing some libs/packages, but the error messages provided by your build system should be enough to get you there.
+
+## TODO / Notes
+
+Morgan - We should be rendering "like" assets right after each other so we dont have to swap VAO's for each object we render. "like" assets should share a VAO pretty much. Honestly we could just create one VAO per asset type. that would be pretty shnazy as well.

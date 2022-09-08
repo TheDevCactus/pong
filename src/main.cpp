@@ -32,6 +32,7 @@ struct GameObject {
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec2 size;
+    glm::mat4 modelUniform;
 };
 
 struct Camera {
@@ -198,14 +199,9 @@ Renderable createRenderable(float vertices[], unsigned int numberOfVerticies) {
     glBindVertexArray(newRenderable.VAO);
     glBindBuffer(GL_ARRAY_BUFFER, newRenderable.VBO);
 
-    glVertexAttribPointer(
-        0, 
-        floatsPerVertexPoint, 
-        GL_FLOAT, 
-        GL_FALSE, 
-        floatsPerVertexPoint * sizeof(float), 
-        (void*)0
-    );
+    glBufferData(GL_ARRAY_BUFFER, numberOfVerticies * sizeof(float), vertices, GL_DYNAMIC_DRAW);
+
+    glVertexAttribPointer(0, floatsPerVertexPoint, GL_FLOAT, GL_FALSE, floatsPerVertexPoint * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     return newRenderable;
 }
@@ -220,6 +216,7 @@ bool createGameObject(std::string id, std::string assetFilePath, GameObject &gam
     gameObject.id = id;
     gameObject.position = glm::vec3(0.0f);
     gameObject.rotation = glm::vec3(0.0f);
+    gameObject.modelUniform = glm::mat4(1.0f);
 
     return true;
 }
@@ -243,31 +240,19 @@ Camera createCamera() {
     return out;
 };
 
-void renderRenderable(Renderable renderable) {
-    float verticesToRender[renderable.vertices.size()];
-    std::copy(renderable.vertices.begin(), renderable.vertices.end(), verticesToRender);
-
+void renderRenderable(Renderable &renderable) {
     glBindVertexArray(renderable.VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, renderable.VBO);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verticesToRender), verticesToRender, GL_DYNAMIC_DRAW);
-
-    glDrawArrays(GL_TRIANGLES, 0, (sizeof(verticesToRender) / sizeof(float)) / 2); 
+    glDrawArrays(GL_TRIANGLES, 0, renderable.vertices.size() / 2); 
 }
 
-void renderGameObject(GameObject &gameObject, unsigned int modelUniformLocation) {
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, gameObject.position);
-    glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, glm::value_ptr(model));
+void renderGameObject(GameObject &gameObject, unsigned int &modelUniformLocation) {
+    gameObject.modelUniform = glm::mat4(1.0f);
+    gameObject.modelUniform = glm::translate(gameObject.modelUniform, gameObject.position);
+    glUniformMatrix4fv(modelUniformLocation, 1, GL_FALSE, glm::value_ptr(gameObject.modelUniform));
     renderRenderable(gameObject.renderable);
 }
 
-void deleteRenderable(Renderable renderable) {
-    glDeleteBuffers(1, &renderable.VBO);
-    glDeleteVertexArrays(1, &renderable.VAO);
-}
-
-bool doGameObjectsCollide(GameObject &objectA, GameObject &objectB) {
+bool gameObjectsCollide(GameObject &objectA, GameObject &objectB) {
     if (
         objectA.position[0] + objectA.size[0] >= objectB.position[0] &&
         objectA.position[0] <= objectB.position[0] + objectB.size[0] &&
@@ -280,7 +265,6 @@ bool doGameObjectsCollide(GameObject &objectA, GameObject &objectB) {
 }
 
 int main() {
-
     GLFWwindow *window_p = initializeGLFWandGLAD();
     if (window_p == NULL) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -427,7 +411,7 @@ int main() {
                     ballForce[0] *= -1;
                 }
 
-                if (doGameObjectsCollide(ball, paddleB)) {
+                if (gameObjectsCollide(ball, paddleB)) {
                     float paddleCenter = paddleB.position[0] + (paddleB.size[0] / 2);
                     float leftPaddleBound = paddleB.position[0];
                     float rightPaddleBound = paddleB.position[0] + paddleB.size[0];
@@ -442,7 +426,7 @@ int main() {
 
                     ballForce[1] *= -1;
                 }
-                if (doGameObjectsCollide(ball, paddleA)) {
+                if (gameObjectsCollide(ball, paddleA)) {
                     float paddleCenter = paddleA.position[0] + (paddleA.size[0] / 2);
                     float leftPaddleBound = paddleA.position[0];
                     float rightPaddleBound = paddleA.position[0] + paddleA.size[0];
@@ -486,8 +470,6 @@ int main() {
         lastFrame = currentTime;
     }
 
-    // deleteRenderable(paddle);
-    // deleteRenderable(paddleB);
     glDeleteProgram(shaderProgram);
 
     glfwTerminate();
