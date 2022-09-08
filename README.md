@@ -55,3 +55,5 @@ Glad lets us configure OpenGL easily across multiple platforms.
 3) `git submodule update`
 4) `cmake .`
 5) `cmake --build .`
+
+You might be missing some libs/packages, but the error messages provided by your build system should be enough to get you there.
