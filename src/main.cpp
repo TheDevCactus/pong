@@ -327,22 +327,32 @@ int main() {
     ball.position[1] = 300.0f;
     ball.position[0] = 400.0f;
 
-    float paddleSpeed = 10.0f;
-    float ballSpeed = 3.0f;
+    float paddleSpeed = 400.0f;
+    float ballSpeed = 200.0f;
     bool gameStarted = false;
     glm::vec2 ballForce = glm::vec2(0.0f, 0.0f);
 
     float time = glfwGetTime();
+    float lastFrame = glfwGetTime();
     int frames = 0;
+
+    glfwSwapInterval(0);
+
     // Application Loop
     while(!glfwWindowShouldClose(window_p)) {
-        ++frames;
         float currentTime = glfwGetTime();
-        if (currentTime - 1 > time) {
-            std::cout << "FPS: " << frames << std::endl;
-            frames = 0;
-            time = currentTime;
+        float deltaTime = glfwGetTime() - lastFrame;
+
+        // Track FPS
+        {
+            ++frames;
+            if (currentTime - 1 > time) {
+                std::cout << "FPS: " << frames << std::endl;
+                frames = 0;
+                time = currentTime;
+            }
         }
+
         // Process user input
         {
             // Start Game - SPACE BAR
@@ -351,53 +361,57 @@ int main() {
                 ballForce[1] = ballSpeed;
             }
 
+            float adjustedPaddleSpeed = paddleSpeed * deltaTime;
             // Move Paddle B - A & D
             if (glfwGetKey(window_p, GLFW_KEY_A) == GLFW_PRESS) {
-                if (paddleB.position[0] < paddleSpeed) {
+                if (paddleB.position[0] < adjustedPaddleSpeed) {
                     paddleB.position[0] = 0.0f;
                 } else {
-                    paddleB.position[0] -= paddleSpeed;
+                    paddleB.position[0] -= adjustedPaddleSpeed; 
                 }
             }
             if (glfwGetKey(window_p, GLFW_KEY_D) == GLFW_PRESS) {
-                if (paddleB.position[0] > WINDOW_WIDTH - paddleB.size[0] - paddleSpeed) {
+                if (paddleB.position[0] > WINDOW_WIDTH - paddleB.size[0] - adjustedPaddleSpeed) {
                     paddleB.position[0] = WINDOW_WIDTH - paddleB.size[0];
                 } else {
-                    paddleB.position[0] += paddleSpeed;
+                    paddleB.position[0] += adjustedPaddleSpeed;
                 }
             }
 
             // Move Paddle A - LEFT & RIGHT
             if (glfwGetKey(window_p, GLFW_KEY_LEFT) == GLFW_PRESS) {
-                if (paddleA.position[0] < paddleSpeed) {
+                if (paddleA.position[0] < adjustedPaddleSpeed) {
                     paddleA.position[0] = 0.0f;
                 } else {
-                    paddleA.position[0] -= paddleSpeed;
+                    paddleA.position[0] -= adjustedPaddleSpeed;
                 }
             }
             if (glfwGetKey(window_p, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-                if (paddleA.position[0] > WINDOW_WIDTH - paddleA.size[0] - paddleSpeed) {
+                if (paddleA.position[0] > WINDOW_WIDTH - paddleA.size[0] - adjustedPaddleSpeed) {
                     paddleA.position[0] = WINDOW_WIDTH - paddleA.size[0];
                 } else {
-                    paddleA.position[0] += paddleSpeed;
+                    paddleA.position[0] += adjustedPaddleSpeed;
                 }
             }
         }
 
         // Move Ball       
         {
-            if (ball.position[1] <= 0) {
-                std::cout << "PLAYER B WINS" << std::endl;
-    
-                glfwTerminate();
-                return 0;
-            }
+            // Win conditions
+            {
+                if (ball.position[1] <= 0) {
+                    std::cout << "PLAYER B WINS" << std::endl;
+        
+                    glfwTerminate();
+                    return 0;
+                }
 
-            if (ball.position[1] >= WINDOW_HEIGHT) {
-                std::cout << "PLAYER A WINS" << std::endl;
+                if (ball.position[1] >= WINDOW_HEIGHT) {
+                    std::cout << "PLAYER A WINS" << std::endl;
 
-                glfwTerminate();
-                return 0;
+                    glfwTerminate();
+                    return 0;
+                }
             }
 
             if (
@@ -413,10 +427,11 @@ int main() {
                 float rightPaddleBound = paddleB.position[0] + paddleB.size[0];
                 float ballCenter = ball.position[0] + (ball.size[0] / 2);
 
+                // TODO: something is wrong here. ball bounces in wrong direction given the side of the paddle it hits
                 if (ballCenter < paddleCenter) {
-                    ballForce[0] = ((ballCenter - leftPaddleBound) / (paddleCenter - leftPaddleBound)) * 2;
+                    ballForce[0] = ((ballCenter - leftPaddleBound) / (paddleCenter - leftPaddleBound)) * -200;
                 } else {
-                    ballForce[0] = ((ballCenter - rightPaddleBound) / (rightPaddleBound - paddleCenter)) * 2;
+                    ballForce[0] = ((ballCenter - rightPaddleBound) / (rightPaddleBound - paddleCenter)) * -200;
                 }
 
                 ballForce[1] *= -1;
@@ -427,32 +442,37 @@ int main() {
                 float rightPaddleBound = paddleA.position[0] + paddleA.size[0];
                 float ballCenter = ball.position[0] + (ball.size[0] / 2);
 
+                // TODO: something is wrong here. ball bounces in wrong direction given the side of the paddle it hits
                 if (ballCenter < paddleCenter) {
-                    ballForce[0] = ((ballCenter - leftPaddleBound) / (paddleCenter - leftPaddleBound)) * 2;
+                    ballForce[0] = ((ballCenter - leftPaddleBound) / (paddleCenter - leftPaddleBound)) * -200;
                 } else {
-                    ballForce[0] = ((ballCenter - rightPaddleBound) / (rightPaddleBound - paddleCenter)) * 2;
+                    ballForce[0] = ((ballCenter - rightPaddleBound) / (rightPaddleBound - paddleCenter)) * -200;
                 }
 
                 ballForce[1] *= -1;
             }
 
-            ball.position[0] += ballForce[0];
-            ball.position[1] += ballForce[1];
+            ball.position[0] += ballForce[0] * deltaTime;
+            ball.position[1] += ballForce[1] * deltaTime;
         }
 
-        // Clear screen
-        glClearColor(0.1f, 0.9f, 0.5f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        // Render
+        {
+            // Clear screen
+            glClearColor(0.1f, 0.9f, 0.5f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
 
-        renderGameObject(paddleA, modelUniformLocation);
-        renderGameObject(paddleB, modelUniformLocation);
-        renderGameObject(ball, modelUniformLocation);
+            renderGameObject(paddleA, modelUniformLocation);
+            renderGameObject(paddleB, modelUniformLocation);
+            renderGameObject(ball, modelUniformLocation);
 
-        // // Swap color buffers
-        glfwSwapBuffers(window_p);
+            // // Swap color buffers
+            glfwSwapBuffers(window_p);
 
-        // Poll events
-        glfwPollEvents();
+            // Poll events
+            glfwPollEvents();
+        }
+        lastFrame = currentTime;
     }
 
     // deleteRenderable(paddle);
