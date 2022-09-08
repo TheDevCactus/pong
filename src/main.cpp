@@ -124,25 +124,38 @@ bool initializeShaderFromFile(std::string filePath, GLenum shaderType, unsigned 
     return true;
 }
 
-bool readAssetFile(std::string assetFilePath, std::vector<float> &verticies) {
+bool readAssetFile(std::string assetFilePath, std::vector<float> &verticies, glm::vec2 &size) {
     std::string fileSource;
     if (!readFileToString(assetFilePath, fileSource)) {
         return false;
     };
-    std::string currentFloat;
+    std::string currentFloatStr;
+
+    size[0] = 0;
+    size[1] = 0;
     for (int i = 0; i < fileSource.size(); i ++) {
         switch (fileSource[i]) {
             case ',': 
             case '\n': {
-                if (currentFloat == "") {
+                if (currentFloatStr == "") {
                     continue;
                 }
-                verticies.push_back(atof(currentFloat.c_str()));
-                currentFloat = "";
+                float currentFloat = atof(currentFloatStr.c_str());
+                if (verticies.size() % 2 == 0) {
+                    if (currentFloat > size[0]) {
+                        size[0] = currentFloat;
+                    }
+                } else {
+                    if (currentFloat > size[1]) {
+                        size[1] = currentFloat;
+                    }
+                }
+                verticies.push_back(currentFloat);
+                currentFloatStr = "";
                 break;
             }
             default: {
-                currentFloat.push_back(fileSource[i]);
+                currentFloatStr.push_back(fileSource[i]);
             }
         }
     }
@@ -199,7 +212,7 @@ Renderable createRenderable(float vertices[], unsigned int numberOfVerticies) {
 
 bool createGameObject(std::string id, std::string assetFilePath, GameObject &gameObject) {
     std::vector<float> assetVerticies;
-    if (!readAssetFile(assetFilePath, assetVerticies)) {
+    if (!readAssetFile(assetFilePath, assetVerticies, gameObject.size)) {
         return false;
     }
     
@@ -302,7 +315,7 @@ int main() {
     ball.position[1] = 300.0f;
     ball.position[0] = 400.0f;
 
-    float paddleSpeed = 2.0f;
+    float paddleSpeed = 10.0f;
     // Application Loop
     while(!glfwWindowShouldClose(window_p)) {
         // Process user input
@@ -315,8 +328,8 @@ int main() {
         }
         if (glfwGetKey(window_p, GLFW_KEY_D) == GLFW_PRESS) {
             // Need to subtract paddle width here.
-            if (paddleB.position[0] > WINDOW_WIDTH - paddleSpeed) {
-                paddleB.position[0] = WINDOW_WIDTH;
+            if (paddleB.position[0] > WINDOW_WIDTH - paddleB.size[0] - paddleSpeed) {
+                paddleB.position[0] = WINDOW_WIDTH - paddleB.size[0];
             } else {
                 paddleB.position[0] += paddleSpeed;
             }
@@ -331,8 +344,8 @@ int main() {
         }
         if (glfwGetKey(window_p, GLFW_KEY_RIGHT) == GLFW_PRESS) {
             // Need to subtract paddle width here.
-            if (paddleA.position[0] > WINDOW_WIDTH - paddleSpeed) {
-                paddleA.position[0] = WINDOW_WIDTH;
+            if (paddleA.position[0] > WINDOW_WIDTH - paddleA.size[0] - paddleSpeed) {
+                paddleA.position[0] = WINDOW_WIDTH - paddleA.size[0];
             } else {
                 paddleA.position[0] += paddleSpeed;
             }
