@@ -408,12 +408,21 @@ int main() {
                 } else {
                     ballForce[0] = ((ballCenter - rightPaddleBound) / (rightPaddleBound - paddleCenter)) * 2;
                 }
-                std::cout << ballForce[0] << " " << ballForce[1] << std::endl;
 
-                float offsetFromPaddleCenter = 
                 ballForce[1] *= -1;
             }
             if (doGameObjectsCollide(ball, paddleA)) {
+                float paddleCenter = paddleA.position[0] + (paddleA.size[0] / 2);
+                float leftPaddleBound = paddleA.position[0];
+                float rightPaddleBound = paddleA.position[0] + paddleA.size[0];
+                float ballCenter = ball.position[0] + (ball.size[0] / 2);
+
+                if (ballCenter < paddleCenter) {
+                    ballForce[0] = ((ballCenter - leftPaddleBound) / (paddleCenter - leftPaddleBound)) * 2;
+                } else {
+                    ballForce[0] = ((ballCenter - rightPaddleBound) / (rightPaddleBound - paddleCenter)) * 2;
+                }
+
                 ballForce[1] *= -1;
             }
 
