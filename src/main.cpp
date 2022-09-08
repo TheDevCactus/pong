@@ -306,22 +306,42 @@ int main() {
 
     ball.position[1] = 300.0f;
     ball.position[0] = 400.0f;
+
+    float paddleSpeed = 2.0f;
     // Application Loop
     while(!glfwWindowShouldClose(window_p)) {
         // Process user input
         // processInput(window_p);
         if (glfwGetKey(window_p, GLFW_KEY_A) == GLFW_PRESS) {
-            paddleB.position[0] -= 2.0f;
+            if (paddleB.position[0] < paddleSpeed) {
+                paddleB.position[0] = 0.0f;
+            } else {
+                paddleB.position[0] -= paddleSpeed;
+            }
         }
         if (glfwGetKey(window_p, GLFW_KEY_D) == GLFW_PRESS) {
-            paddleB.position[0] += 2.0f;
+            // Need to subtract paddle width here.
+            if (paddleB.position[0] > WINDOW_WIDTH - paddleSpeed) {
+                paddleB.position[0] = WINDOW_WIDTH;
+            } else {
+                paddleB.position[0] += paddleSpeed;
+            }
         }
 
         if (glfwGetKey(window_p, GLFW_KEY_LEFT) == GLFW_PRESS) {
-            paddleA.position[0] -= 2.0f;
+            if (paddleA.position[0] < paddleSpeed) {
+                paddleA.position[0] = 0.0f;
+            } else {
+                paddleA.position[0] -= paddleSpeed;
+            }
         }
         if (glfwGetKey(window_p, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-            paddleA.position[0] += 2.0f;
+            // Need to subtract paddle width here.
+            if (paddleA.position[0] > WINDOW_WIDTH - paddleSpeed) {
+                paddleA.position[0] = WINDOW_WIDTH;
+            } else {
+                paddleA.position[0] += paddleSpeed;
+            }
         }
         
         // Clear screen
