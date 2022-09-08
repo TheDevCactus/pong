@@ -314,23 +314,27 @@ int main() {
     unsigned int viewUniformLocation = glGetUniformLocation(shaderProgram, "view");
     unsigned int projectionUniformLocation = glGetUniformLocation(shaderProgram, "projection");
 
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(400.0f, 300.0f, 0.0f));
-
     glUniformMatrix4fv(viewUniformLocation, 1, GL_FALSE, glm::value_ptr(camera.view));
     glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, glm::value_ptr(camera.projection));
 
+    // Initial Paddle Positions
     paddleA.position[1] += 10.0f;
-
+    paddleA.position[0] += 400.0f - paddleA.size[0] / 2;
     paddleB.position[1] += 585.0f;
+    paddleB.position[0] += 400.0f - paddleB.size[0] / 2;
+    // Paddle configuration stuff
+    float paddleSpeed = 400.0f;
 
+    // Initial Ball Position
     ball.position[1] = 300.0f;
     ball.position[0] = 400.0f;
-
-    float paddleSpeed = 400.0f;
-    float ballSpeed = 200.0f;
-    bool gameStarted = false;
+    // Ball configuration stuff
     glm::vec2 ballForce = glm::vec2(0.0f, 0.0f);
+    float ballSpeed = 250.0f;
+
+    // Game configuration stuff
+    bool gameStarted = false;
+
 
     float time = glfwGetTime();
     float lastFrame = glfwGetTime();
@@ -413,47 +417,53 @@ int main() {
                     return 0;
                 }
             }
-
-            if (
-                ball.position[0] <= 0 ||
-                ball.position[0] >= WINDOW_WIDTH - ball.size[0]
-            ) {
-                ballForce[0] *= -1;
-            }
-
-            if (doGameObjectsCollide(ball, paddleB)) {
-                float paddleCenter = paddleB.position[0] + (paddleB.size[0] / 2);
-                float leftPaddleBound = paddleB.position[0];
-                float rightPaddleBound = paddleB.position[0] + paddleB.size[0];
-                float ballCenter = ball.position[0] + (ball.size[0] / 2);
-
-                // TODO: something is wrong here. ball bounces in wrong direction given the side of the paddle it hits
-                if (ballCenter < paddleCenter) {
-                    ballForce[0] = ((paddleCenter - leftPaddleBound)/(ballCenter - leftPaddleBound)) * -100;
-                } else {
-                    ballForce[0] = ((rightPaddleBound - paddleCenter)/(ballCenter - rightPaddleBound)) * -100;
+            
+            // Update Ball Force
+            {
+                if (
+                    ball.position[0] <= 0 ||
+                    ball.position[0] >= WINDOW_WIDTH - ball.size[0]
+                ) {
+                    ballForce[0] *= -1;
                 }
 
-                ballForce[1] *= -1;
-            }
-            if (doGameObjectsCollide(ball, paddleA)) {
-                float paddleCenter = paddleA.position[0] + (paddleA.size[0] / 2);
-                float leftPaddleBound = paddleA.position[0];
-                float rightPaddleBound = paddleA.position[0] + paddleA.size[0];
-                float ballCenter = ball.position[0] + (ball.size[0] / 2);
+                if (doGameObjectsCollide(ball, paddleB)) {
+                    float paddleCenter = paddleB.position[0] + (paddleB.size[0] / 2);
+                    float leftPaddleBound = paddleB.position[0];
+                    float rightPaddleBound = paddleB.position[0] + paddleB.size[0];
+                    float ballCenter = ball.position[0] + (ball.size[0] / 2);
 
-                // TODO: something is wrong here. ball bounces in wrong direction given the side of the paddle it hits
-                if (ballCenter < paddleCenter) {
-                    ballForce[0] = ((ballCenter - leftPaddleBound) / (paddleCenter - leftPaddleBound)) * -100;
-                } else {
-                    ballForce[0] = ((ballCenter - rightPaddleBound) / (rightPaddleBound - paddleCenter)) * -100;
+                    // TODO: something is wrong here. ball bounces in wrong direction given the side of the paddle it hits
+                    if (ballCenter < paddleCenter) {
+                        ballForce[0] = ((paddleCenter - leftPaddleBound) / (ballCenter - leftPaddleBound)) * -70;
+                    } else {
+                        ballForce[0] = ((rightPaddleBound - paddleCenter) / (ballCenter - rightPaddleBound)) * -70;
+                    }
+
+                    ballForce[1] *= -1;
                 }
+                if (doGameObjectsCollide(ball, paddleA)) {
+                    float paddleCenter = paddleA.position[0] + (paddleA.size[0] / 2);
+                    float leftPaddleBound = paddleA.position[0];
+                    float rightPaddleBound = paddleA.position[0] + paddleA.size[0];
+                    float ballCenter = ball.position[0] + (ball.size[0] / 2);
 
-                ballForce[1] *= -1;
+                    // TODO: something is wrong here. ball bounces in wrong direction given the side of the paddle it hits
+                    if (ballCenter < paddleCenter) {
+                        ballForce[0] = ((paddleCenter - leftPaddleBound) / (ballCenter - leftPaddleBound)) * -70;
+                    } else {
+                        ballForce[0] = ((rightPaddleBound - paddleCenter) / (ballCenter - rightPaddleBound)) * -70;
+                    }
+
+                    ballForce[1] *= -1;
+                }
             }
 
-            ball.position[0] += ballForce[0] * deltaTime;
-            ball.position[1] += ballForce[1] * deltaTime;
+            // Update Ball Position
+            {
+                ball.position[0] += ballForce[0] * deltaTime;
+                ball.position[1] += ballForce[1] * deltaTime;
+            }
         }
 
         // Render
@@ -472,6 +482,7 @@ int main() {
             // Poll events
             glfwPollEvents();
         }
+
         lastFrame = currentTime;
     }
 
