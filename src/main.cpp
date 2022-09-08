@@ -429,9 +429,9 @@ int main() {
 
                 // TODO: something is wrong here. ball bounces in wrong direction given the side of the paddle it hits
                 if (ballCenter < paddleCenter) {
-                    ballForce[0] = ((ballCenter - leftPaddleBound) / (paddleCenter - leftPaddleBound)) * -200;
+                    ballForce[0] = ((paddleCenter - leftPaddleBound)/(ballCenter - leftPaddleBound)) * -100;
                 } else {
-                    ballForce[0] = ((ballCenter - rightPaddleBound) / (rightPaddleBound - paddleCenter)) * -200;
+                    ballForce[0] = ((rightPaddleBound - paddleCenter)/(ballCenter - rightPaddleBound)) * -100;
                 }
 
                 ballForce[1] *= -1;
@@ -444,9 +444,9 @@ int main() {
 
                 // TODO: something is wrong here. ball bounces in wrong direction given the side of the paddle it hits
                 if (ballCenter < paddleCenter) {
-                    ballForce[0] = ((ballCenter - leftPaddleBound) / (paddleCenter - leftPaddleBound)) * -200;
+                    ballForce[0] = ((ballCenter - leftPaddleBound) / (paddleCenter - leftPaddleBound)) * -100;
                 } else {
-                    ballForce[0] = ((ballCenter - rightPaddleBound) / (rightPaddleBound - paddleCenter)) * -200;
+                    ballForce[0] = ((ballCenter - rightPaddleBound) / (rightPaddleBound - paddleCenter)) * -100;
                 }
 
                 ballForce[1] *= -1;
