@@ -21,6 +21,7 @@ struct Position {
 };
 
 struct Renderable {
+    std::string id;
     std::vector<float> vertices;
     unsigned int VBO;
     unsigned int VAO;
@@ -264,6 +265,20 @@ bool gameObjectsCollide(GameObject &objectA, GameObject &objectB) {
     return false;
 }
 
+float absClampFloat(float a, float max) {
+    float absA = a;
+    if (absA < 0) {
+        absA *= -1;
+    }
+    if (absA > max) {
+        if (a < 0) {
+            return -max;
+        }
+        return max;
+    }
+    return a;
+}
+
 int main() {
     GLFWwindow *window_p = initializeGLFWandGLAD();
     if (window_p == NULL) {
@@ -417,11 +432,16 @@ int main() {
                     float rightPaddleBound = paddleB.position[0] + paddleB.size[0];
                     float ballCenter = ball.position[0] + (ball.size[0] / 2);
 
-                    // TODO: something is wrong here. ball bounces in wrong direction given the side of the paddle it hits
                     if (ballCenter < paddleCenter) {
-                        ballForce[0] = ((paddleCenter - leftPaddleBound) / (ballCenter - leftPaddleBound)) * -70;
+                        ballForce[0] = absClampFloat(
+                            ((paddleCenter - leftPaddleBound) / (ballCenter - leftPaddleBound)) * -70,
+                            100
+                        );
                     } else {
-                        ballForce[0] = ((rightPaddleBound - paddleCenter) / (ballCenter - rightPaddleBound)) * -70;
+                        ballForce[0] = absClampFloat(
+                            ((rightPaddleBound - paddleCenter) / (ballCenter - rightPaddleBound)) * -70,
+                            100
+                        );
                     }
 
                     ballForce[1] *= -1;
@@ -433,10 +453,16 @@ int main() {
                     float ballCenter = ball.position[0] + (ball.size[0] / 2);
 
                     // TODO: something is wrong here. ball bounces in wrong direction given the side of the paddle it hits
-                    if (ballCenter < paddleCenter) {
-                        ballForce[0] = ((paddleCenter - leftPaddleBound) / (ballCenter - leftPaddleBound)) * -70;
+                    if (ballCenter > paddleCenter) {
+                        ballForce[0] = absClampFloat(
+                            ((paddleCenter - leftPaddleBound) / (ballCenter - leftPaddleBound)) * -70,
+                            100
+                        );
                     } else {
-                        ballForce[0] = ((rightPaddleBound - paddleCenter) / (ballCenter - rightPaddleBound)) * -70;
+                        ballForce[0] = absClampFloat(
+                            ((rightPaddleBound - paddleCenter) / (ballCenter - rightPaddleBound)) * -70,
+                            100
+                        );
                     }
 
                     ballForce[1] *= -1;
